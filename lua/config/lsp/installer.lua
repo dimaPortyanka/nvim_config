@@ -9,7 +9,7 @@ function M.setup(servers, options)
 	for server_name, _ in pairs(servers) do
 		local server_available, server = lsp_installer_servers.get_server(server_name)
 		require("lspconfig")[server_name].setup({
-			on_attach = function(client, bufnr)
+			on_attach = function()
 				require("lsp_signature").on_attach() -- Note: add in lsp client on-attach
 			end,
 		})
@@ -45,8 +45,6 @@ function M.setup(servers, options)
 					-- documentation = cmp.config.window.bordered(),
 				},
 				mapping = cmp.mapping.preset.insert({
-					["<C-b>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
 					["<C-Space>"] = cmp.mapping.complete(),
 					["<C-e>"] = cmp.mapping.abort(),
 					["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
@@ -55,7 +53,7 @@ function M.setup(servers, options)
 					{ name = "nvim_lsp" },
 					{ name = "vsnip" }, -- For vsnip users.
 					-- { name = 'luasnip' }, -- For luasnip users.
-					{ name = 'ultisnips' }, -- For ultisnips users.
+					{ name = "ultisnips" }, -- For ultisnips users.
 					-- { name = 'snippy' }, -- For snippy users.
 				}, {
 					{ name = "buffer" },
@@ -83,6 +81,39 @@ function M.setup(servers, options)
 			utils.error(server)
 		end
 	end
+
+	local sumneko_root_path = os.getenv("HOME") .. "/tools/lua-language-server"
+	local sumneko_binary_path = sumneko_root_path .. "/bin/lua-language-server"
+
+	local runtime_path = vim.split(package.path, ";")
+	table.insert(runtime_path, "lua/?.lua")
+	table.insert(runtime_path, "lua/?/init.lua")
+
+	require("lspconfig").sumneko_lua.setup({
+		cmd = { sumneko_binary_path, "-E", sumneko_root_path .. "/main.lua" },
+		settings = {
+			Lua = {
+				runtime = {
+					-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+					version = "LuaJIT",
+					-- Setup your lua path
+					path = runtime_path,
+				},
+				diagnostics = {
+					-- Get the language server to recognize the `vim` global
+					globals = { "vim" },
+				},
+				workspace = {
+					-- Make the server aware of Neovim runtime files
+					library = vim.api.nvim_get_runtime_file("", true),
+				},
+				-- Do not send telemetry data containing a randomized but unique identifier
+				telemetry = {
+					enable = false,
+				},
+			},
+		},
+	})
 end
 
 return M

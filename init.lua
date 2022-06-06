@@ -110,18 +110,40 @@ packer.startup({
 		use("jremmen/vim-ripgrep")
 		use({ "echasnovski/mini.nvim", branch = "stable" })
 
-		use 'hrsh7th/cmp-nvim-lsp'
-		use 'hrsh7th/cmp-buffer'
-		use 'hrsh7th/cmp-path'
-		use 'hrsh7th/nvim-cmp'
-		use 'SirVer/ultisnips'
-		use 'quangnguyen30192/cmp-nvim-ultisnips'
+		use("hrsh7th/cmp-nvim-lsp")
+		use("hrsh7th/cmp-buffer")
+		use("hrsh7th/cmp-path")
+		use("hrsh7th/nvim-cmp")
+		use("SirVer/ultisnips")
+		use("hrsh7th/vim-vsnip")
+		use("hrsh7th/vim-vsnip-integ")
+		use("quangnguyen30192/cmp-nvim-ultisnips")
 
 		use({
 			"jghauser/mkdir.nvim",
 		})
 		use("ray-x/lsp_signature.nvim")
-		use {
+		use({
+			"williamboman/nvim-lsp-installer",
+			{
+				"neovim/nvim-lspconfig",
+				config = function()
+					require("nvim-lsp-installer").setup({
+						automatic_installation = true, -- automatically detect which servers to install (based on which servers are set up via lspconfig)
+						ui = {
+							icons = {
+								server_installed = "✓",
+								server_pending = "➜",
+								server_uninstalled = "✗",
+							},
+						},
+					})
+					local lspconfig = require("lspconfig")
+					lspconfig.sumneko_lua.setup({})
+				end,
+			},
+		})
+		use({
 			"neovim/nvim-lspconfig",
 			opt = true,
 			event = "BufReadPre",
@@ -133,7 +155,7 @@ packer.startup({
 				"williamboman/nvim-lsp-installer",
 				"ray-x/lsp_signature.nvim",
 			},
-		}
+		})
 		use("norcalli/nvim-colorizer.lua")
 		use("tjdevries/colorbuddy.nvim")
 		use("bkegley/gloombuddy")
@@ -144,10 +166,9 @@ packer.startup({
 			run = ":TSUpdate",
 		})
 
-		use {
+		use({
 			"ms-jpq/coq_nvim",
-		}
-
+		})
 
 		use({
 			"lewis6991/gitsigns.nvim",
@@ -168,7 +189,6 @@ vim.api.nvim_create_autocmd("BufEnter", {
 	command = "if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif",
 	nested = true,
 })
-
 
 local wilder = require("wilder")
 wilder.setup({ modes = { ":", "/", "?" } })
@@ -203,7 +223,7 @@ require("mini.surround").setup({})
 
 require("nvim-treesitter.configs").setup({
 	-- A list of parser names, or "all"
-	ensure_installed = { "javascript", "lua", "go" }
+	ensure_installed = { "javascript", "lua", "go" },
 })
 
 local autosave = require("autosave")
