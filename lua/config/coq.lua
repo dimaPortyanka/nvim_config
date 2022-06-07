@@ -12,7 +12,7 @@ function M.setup()
 		{ src = "figlet", trigger = "!big" }, -- figlet command
 		{
 			src = "repl",
-			sh = "zsh",
+			sh = "bash",
 			shell = { p = "perl", n = "node" },
 			max_lines = 99,
 			deadline = 500,

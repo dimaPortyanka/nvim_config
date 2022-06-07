@@ -34,10 +34,14 @@ g.autoread = true
 g.autowrite = true
 g.auto_save = 1
 wo.number = true
+wo.cursorline = true
 wo.relativenumber = true
 wo.signcolumn = "yes"
 wo.wrap = false
 
+g.coq_settings = {
+	auto_start = true,
+}
 g.mapleader = " "
 g.netrw_banner = 0
 
@@ -99,10 +103,8 @@ packer.startup({
 			end,
 		})
 
-		use("sunjon/shade.nvim")
 		use("Pocco81/AutoSave.nvim")
 		use("sheerun/vim-polyglot")
-		use("nvim-lua/completion-nvim")
 		use("nvim-lua/popup.nvim")
 		use("nvim-lua/plenary.nvim")
 		use("nvim-lua/telescope.nvim")
@@ -110,14 +112,14 @@ packer.startup({
 		use("jremmen/vim-ripgrep")
 		use({ "echasnovski/mini.nvim", branch = "stable" })
 
-		use("hrsh7th/cmp-nvim-lsp")
-		use("hrsh7th/cmp-buffer")
-		use("hrsh7th/cmp-path")
-		use("hrsh7th/nvim-cmp")
 		use("SirVer/ultisnips")
 		use("hrsh7th/vim-vsnip")
 		use("hrsh7th/vim-vsnip-integ")
-		use("quangnguyen30192/cmp-nvim-ultisnips")
+		use("neovim/nvim-lspconfig") -- Collection of configurations for built-in LSP client
+		use("hrsh7th/nvim-cmp") -- Autocompletion plugin
+		use("hrsh7th/cmp-nvim-lsp") -- LSP source for nvim-cmp
+		use("saadparwaiz1/cmp_luasnip") -- Snippets source for nvim-cmp
+		use("L3MON4D3/LuaSnip") --
 
 		use({
 			"jghauser/mkdir.nvim",
@@ -125,36 +127,7 @@ packer.startup({
 		use("ray-x/lsp_signature.nvim")
 		use({
 			"williamboman/nvim-lsp-installer",
-			{
-				"neovim/nvim-lspconfig",
-				config = function()
-					require("nvim-lsp-installer").setup({
-						automatic_installation = true, -- automatically detect which servers to install (based on which servers are set up via lspconfig)
-						ui = {
-							icons = {
-								server_installed = "✓",
-								server_pending = "➜",
-								server_uninstalled = "✗",
-							},
-						},
-					})
-					local lspconfig = require("lspconfig")
-					lspconfig.sumneko_lua.setup({})
-				end,
-			},
-		})
-		use({
 			"neovim/nvim-lspconfig",
-			opt = true,
-			event = "BufReadPre",
-			wants = { "nvim-lsp-installer", "lsp_signature.nvim", "coq_nvim" },
-			config = function()
-				require("config.lsp").setup()
-			end,
-			requires = {
-				"williamboman/nvim-lsp-installer",
-				"ray-x/lsp_signature.nvim",
-			},
 		})
 		use("norcalli/nvim-colorizer.lua")
 		use("tjdevries/colorbuddy.nvim")
@@ -168,6 +141,13 @@ packer.startup({
 
 		use({
 			"ms-jpq/coq_nvim",
+			config = function()
+				require("config.coq").setup()
+			end,
+			requires = {
+				{ "ms-jpq/coq.artifacts", branch = "artifacts" },
+				{ "ms-jpq/coq.thirdparty", branch = "3p", module = "coq_3p" },
+			},
 		})
 
 		use({
@@ -204,7 +184,6 @@ wilder.set_option("pipeline", {
 })
 
 require("lsp_signature").setup({})
-require("shade").setup()
 require("colorizer").setup()
 
 require("mini.trailspace").setup({})
